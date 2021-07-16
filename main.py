@@ -24,6 +24,7 @@ def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="What do you want to search?")
 
 
+# TODO add search usage here
 def read_input(update, context):
     """
     Reads regular user's input
