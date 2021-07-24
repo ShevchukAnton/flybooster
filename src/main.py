@@ -33,15 +33,17 @@ async def start_handler(message: types.Message):
 async def echo(message: types.Message):
     search_results = await searcher.find(message.text)
     ans = 'Results:\n'
+    if len(search_results['books']) == 0:
+        ans = f"{emoji.emojize(':disappointed_face:')} We couldn't find any results for \"***{message.text}***\""
     # For now send back only first five findings
     for result in search_results['books'][:5]:
         ans += f"""
         {emoji.emojize(':books:')} : {result['book_name']}
-        {emoji.emojize(':man:')} : {result['author']}
-        {emoji.emojize(':link:')} : {result['book_link']}
-        ------------------------------------------------------------
+        {emoji.emojize(':memo:')} : {result['author']}
+        {emoji.emojize(':link:')} : [download]({result['book_link']}) 
+        -------------------------------------------------------
         """
-    await message.answer(ans)
+    await message.answer(ans, parse_mode='Markdown')
 
 
 if __name__ == '__main__':
