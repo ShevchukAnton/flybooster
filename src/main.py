@@ -26,24 +26,24 @@ async def start_handler(message: types.Message):
     user = message.from_user.username
     if user is None:
         user = message.from_user.full_name
-    await message.reply(f"Hi {user}!\nI'm SearchBot!\nWhat do you want to search?")
+    await message.reply(f"Ку-ку {user}!\nЯ поисковый бот для книг!\nЧто изволите искать?")
 
 
 @dp.message_handler(regexp='^\w+|^\d+')
 async def echo(message: types.Message):
     search_results = await searcher.find(message.text)
-    ans = 'Results:\n'
+    ans = f'Найдено ***{len(search_results["books"])}*** книг (первые 5 будут показаны):\n'
     if len(search_results['books']) == 0:
-        ans = f"{emoji.emojize(':disappointed_face:')} We couldn't find any results for \"***{message.text}***\""
+        ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли нечго найти по запросу: \"***{message.text}***\""
     # For now send back only first five findings
     for result in search_results['books'][:5]:
         ans += f"""
-        {emoji.emojize(':books:')} : {result['book_name']}
-        {emoji.emojize(':memo:')} : {result['author']}
-        {emoji.emojize(':link:')} : [download]({result['book_link']}) 
+        {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}
+        {emoji.emojize(':memo:')} : {result.get('author', 'Автор не установлен')}
+        {emoji.emojize(':link:')} : [download]({result.get('book_link', f'{emoji.emojize(":disappointed_face:")} Невозможно скачать')}) 
         -------------------------------------------------------
         """
-    await message.answer(ans, parse_mode='Markdown')
+    await message.answer(ans.replace('_', ' '), parse_mode='Markdown')
 
 
 if __name__ == '__main__':
