@@ -31,6 +31,7 @@ async def start_handler(message: types.Message):
 
 @dp.message_handler(regexp='^\w+|^\d+')
 async def echo(message: types.Message):
+    logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
     search_results = await searcher.find(message.text)
     ans = f'Найдено ***{len(search_results["books"])}*** книг (первые 5 будут показаны):\n'
     if len(search_results['books']) == 0:
