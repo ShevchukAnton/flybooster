@@ -33,7 +33,7 @@ async def start_handler(message: types.Message):
 async def echo(message: types.Message):
     logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
     search_results = await searcher.find(message.text)
-    ans = f'Найдено ***{len(search_results["books"])}*** книг (первые 5 будут показаны):\n'
+    ans = f'Книг найдено: ***{len(search_results["books"])}*** (первые 5 будут показаны):\n'
     if len(search_results['books']) == 0:
         ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли нечго найти по запросу: \"***{message.text}***\""
     # For now send back only first five findings
