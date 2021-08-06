@@ -47,12 +47,12 @@ async def create_a_message(content):
     for result in content['books'][:5]:
         links = ''
         for fmt, link in result.get('fmts').items():
-            links += f'[{fmt}]({link})\t'
+            links += f"{emoji.emojize(':link:')} : [{fmt}]({link})\n"
 
         ans += f"""
             {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}
             {emoji.emojize(':memo:')} : {result.get('author', 'Автор не установлен')}
-            {emoji.emojize(':link:')} : {links}) 
+            {links}
             -------------------------------------------------------
             """
     return ans
