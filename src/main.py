@@ -44,10 +44,11 @@ async def echo(message: types.Message):
 async def create_a_message(content):
     ans = f'Книг найдено: ***{len(content["books"])}*** (первые 5 будут показаны):\n'
     # For now send back only first five findings
-    for result in content['books'][:5]:
+    books = await searcher.find_downloadable_formats(content['books'][:5])
+    for result in books:
         links = ''
         for fmt, link in result.get('fmts').items():
-            links += f"{emoji.emojize(':link:')} : [{fmt}]({link})\n"
+            links += f"{emoji.emojize(':link:')} : [{fmt}]({link})\n            "
 
         ans += f"""
             {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}

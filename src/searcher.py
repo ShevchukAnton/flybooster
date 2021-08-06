@@ -84,7 +84,6 @@ async def parse_by_books(file_to_parse):
                 elif re.search(Pattern.AUTHORS.value, href):
                     books[-1]['author'] = link.get_text()
 
-    books = await find_downloadable_formats(books)
     return books
 
 
