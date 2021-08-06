@@ -46,8 +46,8 @@ async def create_a_message(content):
     # For now send back only first five findings
     for result in content['books'][:5]:
         links = ''
-        for link in result.get('fmts'):
-            links += f'[{link.key}]({link.value})\t'
+        for fmt, link in result.get('fmts').items():
+            links += f'[{fmt}]({link})\t'
 
         ans += f"""
             {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}
