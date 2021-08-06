@@ -33,18 +33,29 @@ async def start_handler(message: types.Message):
 async def echo(message: types.Message):
     logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
     search_results = await searcher.find(message.text)
-    ans = f'Книг найдено: ***{len(search_results["books"])}*** (первые 5 будут показаны):\n'
     if len(search_results['books']) == 0:
         ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли нечго найти по запросу: \"***{message.text}***\""
-    # For now send back only first five findings
-    for result in search_results['books'][:5]:
-        ans += f"""
-        {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}
-        {emoji.emojize(':memo:')} : {result.get('author', 'Автор не установлен')}
-        {emoji.emojize(':link:')} : [download]({result.get('book_link', f'{emoji.emojize(":disappointed_face:")} Невозможно скачать')}) 
-        -------------------------------------------------------
-        """
+    else:
+        ans = await create_a_message(search_results)
+
     await message.answer(ans.replace('_', ' '), parse_mode='Markdown')
+
+
+async def create_a_message(content):
+    ans = f'Книг найдено: ***{len(content["books"])}*** (первые 5 будут показаны):\n'
+    # For now send back only first five findings
+    for result in content['books'][:5]:
+        links = ''
+        for link in result.get('fmts'):
+            links += f'[{link.key}]({link.value})\t'
+
+        ans += f"""
+            {emoji.emojize(':books:')} : {result.get('book_name', 'Безымянная книга')}
+            {emoji.emojize(':memo:')} : {result.get('author', 'Автор не установлен')}
+            {emoji.emojize(':link:')} : {links}) 
+            -------------------------------------------------------
+            """
+    return ans
 
 
 if __name__ == '__main__':
