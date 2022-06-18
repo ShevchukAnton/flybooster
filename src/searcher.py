@@ -96,7 +96,7 @@ async def find_downloadable_formats(books_list):
             url = f'{link}/{fmt.value}'
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as request:
-                    if request.headers.get('Content-Disposition').__contains__(download_formats.links[fmt.name]):
+                    if request.headers.get('Content-Disposition') and (download_formats.links[fmt.name] in request.headers.get('Content-Disposition')):
                         links[fmt.name.lower()] = url
         books_list[books_list.index(book)]['fmts'] = links
 
