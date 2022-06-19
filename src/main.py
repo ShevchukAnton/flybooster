@@ -34,7 +34,7 @@ async def echo(message: types.Message):
     logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
     search_results = await searcher.find(message.text)
     if len(search_results['books']) == 0:
-        ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли нечго найти по запросу: \"***{message.text}***\""
+        ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли ничего найти по запросу: \"***{message.text}***\""
     else:
         ans = await create_a_message(search_results)
 
@@ -42,7 +42,10 @@ async def echo(message: types.Message):
 
 
 async def create_a_message(content):
-    ans = f'Книг найдено: ***{len(content["books"])}*** (первые 5 будут показаны):\n'
+    ans = f'Книг найдено: ***{len(content["books"])}***\n'
+    if len(content["books"]) > 5:
+        ans = f'Книг найдено: ***{len(content["books"])}*** (первые 5 будут показаны):\n'
+    
     # For now send back only first five findings
     books = await searcher.find_downloadable_formats(content['books'][:5])
     for result in books:
