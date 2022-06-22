@@ -52,7 +52,7 @@ async def echo(message: Message):
         await message.answer(ans.replace('_', ' '), parse_mode='Markdown')
 
 
-@dp.callback_query_handler(func=lambda cb: cb.data == 'show_all')
+@dp.callback_query_handler(lambda cb: cb.data == 'show_all')
 async def show_all_books(callback_query: CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
