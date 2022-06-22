@@ -1,3 +1,4 @@
+from copy import copy
 import logging
 import os
 
@@ -69,7 +70,7 @@ async def create_a_message(content, limit=5):
     books = await searcher.find_downloadable_formats(content[:limit])
 
     if limit is not None and books_amount > limit:
-        all_books = content['books']
+        all_books = content
         ans = f'Книг найдено: ***{books_amount}*** (первые {limit} будут показаны):\n'
 
     ans += await message_helper.compile_message(books)
