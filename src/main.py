@@ -75,7 +75,7 @@ async def create_a_message(content, limit=5):
 
     ans += await message_helper.compile_message(books)
 
-    all_books.remove(books)
+    all_books = [book for book in all_books if book not in books]
 
     return ans
 
