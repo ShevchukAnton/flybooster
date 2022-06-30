@@ -1,4 +1,3 @@
-from copy import copy
 import logging
 import os
 
@@ -38,6 +37,9 @@ async def start_handler(message: Message):
 async def echo(message: Message):
     logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
 
+    starting_search_msg = f"Приступаем к скурпулёзному поиску {emoji.emojize(':flashlight:')}"
+    await message.answer(starting_search_msg, parse_mode='Markdown')
+
     search_results = await searcher.find(message.text)
     if len(search_results['books']) == 0:
         ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли ничего найти по запросу: \"***{message.text}***\""
@@ -45,7 +47,9 @@ async def echo(message: Message):
         ans = await create_a_message(search_results['books'])
 
     if len(all_books) > 0:
-        inline_button = InlineKeyboardButton('Показать все', callback_data='show_all')
+        txt = 'Показать ещё 5' if len(all_books) > 5 else f'Показать {len(all_books)}'
+
+        inline_button = InlineKeyboardButton(txt, callback_data='show_more')
         inline_markup = InlineKeyboardMarkup().add(inline_button)
 
         await message.answer(ans.replace('_', ' '), parse_mode='Markdown', reply_markup=inline_markup)
@@ -53,20 +57,32 @@ async def echo(message: Message):
         await message.answer(ans.replace('_', ' '), parse_mode='Markdown')
 
 
-@dp.callback_query_handler(lambda cb: cb.data == 'show_all')
-async def show_all_books(callback_query: CallbackQuery):
+@dp.callback_query_handler(lambda cb: cb.data == 'show_more')
+async def show_more_books(callback_query: CallbackQuery):
+    global all_books
     await bot.answer_callback_query(callback_query.id)
+    loading_more_books_msg = f'Перерываем архив поиска {emoji.emojize(":zzz:")}'
 
-    msg = create_a_message(all_books, None)
+    await bot.send_message(callback_query.from_user.id, loading_more_books_msg, parse_mode='Markdown')
 
-    await bot.send_message(callback_query.from_user.id, msg)
+    msg = await create_a_message(all_books)
+
+    if len(all_books) > 0:
+        txt = 'Показать ещё 5' if len(all_books) > 5 else f'Показать {len(all_books)}'
+
+        inline_button = InlineKeyboardButton(txt, callback_data='show_more')
+        inline_markup = InlineKeyboardMarkup().add(inline_button)
+
+        await bot.send_message(callback_query.from_user.id, msg.replace('_', ' '), parse_mode='Markdown', reply_markup=inline_markup)
+    else:
+        await bot.send_message(callback_query.from_user.id, msg.replace('_', ' '), parse_mode='Markdown')
 
 
 async def create_a_message(content, limit=5):
+    global all_books
     books_amount = len(content)
     ans = f'Книг найдено: ***{books_amount}***\n'
 
-    # For now send back only first five findings
     books = await searcher.find_downloadable_formats(content[:limit])
 
     if limit is not None and books_amount > limit:
