@@ -1,13 +1,15 @@
+from src import searcher, message_helper
+from dotenv import load_dotenv
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher import FSMContext
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.utils import executor
+from aiogram import Bot, Dispatcher
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+import emoji
 import logging
 import os
 
-import emoji
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
-from aiogram import Bot, Dispatcher
-from aiogram.utils import executor
-from dotenv import load_dotenv
-
-from src import searcher, message_helper
 
 load_dotenv()
 logging.basicConfig(
@@ -16,10 +18,21 @@ logging.basicConfig(
 token = os.getenv('TOKEN')
 
 # Initialize bot and dispatcher
+storage = MemoryStorage()
 bot = Bot(token=token)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=storage)
+
+
+class Name_request(StatesGroup):
+    query = State()
+
+class Author_request(StatesGroup):
+    query = State()
+
 
 all_books = []
+starting_search_msg = f"Приступаем к скурпулёзному поиску {emoji.emojize(':flashlight:')}"
+placeholder = 'Этот функционал находится в разработке. Воспользуйтесь поиском по имени'
 
 
 @dp.message_handler(commands=['start'])
@@ -33,21 +46,79 @@ async def start_handler(message: Message):
     await message.reply(f"Ку-ку {user}!\nЯ поисковый бот для книг!\nЧто изволите искать?")
 
 
-@dp.message_handler(regexp='^\w+|^\d+')
+@dp.message_handler(commands=['name'])
 async def echo(message: Message):
-    logging.info(f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
+    search_question = 'Введите название книги, или его часть'
+    await Name_request.query.set()
+    await message.answer(search_question)
 
-    starting_search_msg = f"Приступаем к скурпулёзному поиску {emoji.emojize(':flashlight:')}"
+
+@dp.message_handler(commands=['author'])
+async def search_by_author(message: Message):
+    search_question = 'Введите ФИО автора, или часть данных'
+    # await Author_request.query.set()
+    await message.reply(placeholder)
+
+
+@dp.message_handler(commands=['genre'])
+async def echo(message: Message):
+    search_question = 'Введите название книги, или его часть'
+    # await Name_request.query.set()
+    await message.reply(placeholder)
+
+
+@dp.message_handler(commands=['series'])
+async def echo(message: Message):
+    search_question = 'Введите название книги, или его часть'
+    # await Name_request.query.set()
+    await message.reply(placeholder)
+
+
+@dp.message_handler(state=Name_request.query)
+async def query_handler(message: Message, state: FSMContext):
+    await state.finish()
+
+    logging.info(
+        f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
+
     await message.answer(starting_search_msg, parse_mode='Markdown')
 
-    search_results = await searcher.find(message.text)
+    search_results = await searcher.search_by_name(message.text)
     if len(search_results['books']) == 0:
         ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли ничего найти по запросу: \"***{message.text}***\""
     else:
         ans = await create_a_message(search_results['books'])
 
     if len(all_books) > 0:
-        txt = 'Показать ещё 5' if len(all_books) > 5 else f'Показать {len(all_books)}'
+        txt = 'Показать ещё 5' if len(
+            all_books) > 5 else f'Показать {len(all_books)}'
+
+        inline_button = InlineKeyboardButton(txt, callback_data='show_more')
+        inline_markup = InlineKeyboardMarkup().add(inline_button)
+
+        await message.answer(ans.replace('_', ' '), parse_mode='Markdown', reply_markup=inline_markup)
+    else:
+        await message.answer(ans.replace('_', ' '), parse_mode='Markdown')
+
+
+@dp.message_handler(state=Author_request.query)
+async def query_handler(message: Message, state: FSMContext):
+    await state.finish()
+
+    logging.info(
+        f'User {message.from_user.username} - {message.from_user.full_name} requested for {message.text}')
+
+    await message.answer(starting_search_msg, parse_mode='Markdown')
+
+    search_results = await searcher.search_by_author(message.text)
+    if len(search_results['authors']) == 0:
+        ans = f"{emoji.emojize(':disappointed_face:')} Мы не смогли ничего найти по запросу: \"***{message.text}***\""
+    else:
+        ans = await create_a_message(search_results['authors'])
+
+    if len(all_books) > 0:
+        txt = 'Показать ещё 5' if len(
+            all_books) > 5 else f'Показать {len(all_books)}'
 
         inline_button = InlineKeyboardButton(txt, callback_data='show_more')
         inline_markup = InlineKeyboardMarkup().add(inline_button)
@@ -68,7 +139,8 @@ async def show_more_books(callback_query: CallbackQuery):
     msg = await create_a_message(all_books)
 
     if len(all_books) > 0:
-        txt = 'Показать ещё 5' if len(all_books) > 5 else f'Показать {len(all_books)}'
+        txt = 'Показать ещё 5' if len(
+            all_books) > 5 else f'Показать {len(all_books)}'
 
         inline_button = InlineKeyboardButton(txt, callback_data='show_more')
         inline_markup = InlineKeyboardMarkup().add(inline_button)
