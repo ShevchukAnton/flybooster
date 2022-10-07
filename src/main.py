@@ -1,6 +1,3 @@
-import sys
-sys.path.append('.')
-
 from src import searcher, message_helper
 from dotenv import load_dotenv
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -35,6 +32,7 @@ class Author_request(StatesGroup):
 
 all_books = []
 starting_search_msg = f"Приступаем к скурпулёзному поиску {emoji.emojize(':flashlight:')}"
+placeholder = 'Этот функционал находится в разработке. Воспользуйтесь поиском по имени'
 
 
 @dp.message_handler(commands=['start'])
@@ -58,22 +56,22 @@ async def echo(message: Message):
 @dp.message_handler(commands=['author'])
 async def search_by_author(message: Message):
     search_question = 'Введите ФИО автора, или часть данных'
-    await Author_request.query.set()
-    await message.answer(search_question)
+    # await Author_request.query.set()
+    await message.reply(placeholder)
 
 
-@dp.message_handler(commands=['name'])
+@dp.message_handler(commands=['genre'])
 async def echo(message: Message):
     search_question = 'Введите название книги, или его часть'
-    await Name_request.query.set()
-    await message.answer(search_question)
+    # await Name_request.query.set()
+    await message.reply(placeholder)
 
 
-@dp.message_handler(commands=['name'])
+@dp.message_handler(commands=['series'])
 async def echo(message: Message):
     search_question = 'Введите название книги, или его часть'
-    await Name_request.query.set()
-    await message.answer(search_question)
+    # await Name_request.query.set()
+    await message.reply(placeholder)
 
 
 @dp.message_handler(state=Name_request.query)
