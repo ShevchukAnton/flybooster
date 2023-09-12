@@ -32,7 +32,6 @@ async def search_by_name(query=str):
 
     if final_result:
         search_by_name.cache_info()
-
     # remove temp file at the end
     os.remove(os.path.abspath(temp.name))
     return final_result
