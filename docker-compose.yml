@@ -1,0 +1,7 @@
+services:
+  bot:
+    build: .
+    ports:
+      - 8087:8087
+    environment:
+      - TOKEN=

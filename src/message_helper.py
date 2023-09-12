@@ -11,8 +11,8 @@ async def compile_message(books_list: list):
             links += f"{emoji.emojize(':link:')} : [{fmt}]({link})\n            "
 
         msg += f"""
-            {emoji.emojize(':books:')} : {book.get('book_name', 'Безымянная книга')}
-            {emoji.emojize(':memo:')} : {book.get('author', 'Автор не установлен')}
+            {emoji.emojize(':books:')} : {book.get('book_name', 'Книга без назви')}
+            {emoji.emojize(':memo:')} : {book.get('author', 'Автор не виявлен')}
             {links}
             -------------------------------------------------------
             """

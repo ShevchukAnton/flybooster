@@ -7,4 +7,4 @@ create .env file at the project's root and keep there required environment varia
 
 ### Sources
 API for telegram bots
-https://github.com/python-telegram-bot/python-telegram-bot
+https://docs.aiogram.dev/en/latest/

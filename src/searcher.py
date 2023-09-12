@@ -10,11 +10,13 @@ from enums import download_formats
 from enums.download_formats import Formats
 from enums.link_patterns import Pattern
 from enums.search_filters import Filters
+from functools import lru_cache
 
 BOOSTA_URL = 'http://flibusta.is'
 BASE_PAGE = f'{BOOSTA_URL}/booksearch?ask='
 
 
+@lru_cache(maxsize=128, typed=False)
 async def search_by_name(query=str):
     final_result = {}
     url = f'{BASE_PAGE}{query}'
@@ -28,6 +30,8 @@ async def search_by_name(query=str):
 
         final_result['books'] = await parse_by_books(temp.name)
 
+    if final_result:
+        search_by_name.cache_info()
     # remove temp file at the end
     os.remove(os.path.abspath(temp.name))
     return final_result

@@ -142,3 +142,10 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
+# My ignore
+*template*
+*example*
+notes
+*.rest
+test.py
