@@ -42,6 +42,8 @@ async def start_handler(message: Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
+    global all_books
+    all_books.clear()
     user = message.from_user.username
     if user is None:
         user = message.from_user.full_name
@@ -50,6 +52,8 @@ async def start_handler(message: Message):
 
 @dp.message_handler(commands=['name'])
 async def echo(message: Message):
+    global all_books
+    all_books.clear()
     search_question = 'Введіть назву книги або частину назви'
     await Name_request.query.set()
     await message.answer(search_question)
@@ -57,6 +61,8 @@ async def echo(message: Message):
 
 @dp.message_handler(commands=['author'])
 async def search_by_author(message: Message):
+    global all_books
+    all_books.clear()
     search_question = 'Введіть П.І.Б автора або якусь частину з них'
     await Author_request.query.set()
     await message.answer(search_question)
@@ -64,6 +70,8 @@ async def search_by_author(message: Message):
 
 @dp.message_handler(commands=['genre'])
 async def echo(message: Message):
+    global all_books
+    all_books.clear()
     search_question = 'Введіть бажаний жанр'
     await Name_request.query.set()
     await message.answer(search_question)
@@ -71,6 +79,8 @@ async def echo(message: Message):
 
 @dp.message_handler(commands=['series'])
 async def echo(message: Message):
+    global all_books
+    all_books.clear()
     search_question = 'Введіть назву серії або частину назви'
     await Name_request.query.set()
     await message.answer(search_question)
