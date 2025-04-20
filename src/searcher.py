@@ -1,6 +1,7 @@
 import os
 import re
 import time
+from functools import lru_cache
 
 import aiofiles as aiofiles
 import aiohttp
@@ -10,7 +11,6 @@ from enums import download_formats
 from enums.download_formats import Formats
 from enums.link_patterns import Pattern
 from enums.search_filters import Filters
-from functools import lru_cache
 
 BOOSTA_URL = 'http://flibusta.is'
 BASE_PAGE = f'{BOOSTA_URL}/booksearch?ask='
